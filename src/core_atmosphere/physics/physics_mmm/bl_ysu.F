@@ -2,6 +2,7 @@
 !=================================================================================================================
  module bl_ysu
  use ccpp_kinds,only: kind_phys
+ use mpas_log, only : mpas_log_write  !added by KSA
 
  implicit none
  private
@@ -529,6 +530,7 @@
      hgamv(i)  = 0.0
      delta(i)  = 0.0
      wstar3_2(i) =  0.0
+     we(i)       =  0.0    !added by KSA (following Huancui Hu) to avoid run-time error
    enddo
 !
    do k = kts,klpbl
@@ -919,6 +921,8 @@
            xkzm(i,k) = wscalek(i,k) *karman*    zq(i,k+1)      *    zfac(i,k)**pfac+ &
                        wscalek2(i,k)*karman*(hpbl(i)-zq(i,k+1))*(1-zfac(i,k))**pfac
          !Do not include xkzm at kpbl-1 since it changes entrainment
+         !KSA floating point error from the following if statement when debug = true and
+         ! with gnu compiler         
          if (k.eq.kpbl(i)-1.and.cloudflg(i).and.we(i).lt.0.0) then
            xkzm(i,k) = 0.0
          endif
